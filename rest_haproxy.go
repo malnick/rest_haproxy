@@ -12,9 +12,10 @@ import (
 )
 
 type Available struct {
-	Name string
-	Ip   string
-	Port string
+	Name     string
+	Ip       string
+	Port     string
+	MgmtPort string
 }
 
 type Services struct {
@@ -43,8 +44,17 @@ func parsefile(filename string) (*Services, error) {
 			log.Println("Matched: %s\n", line)
 			larry := strings.Split(line, " ")
 			a.Name = larry[1]
+
 			dest := strings.Split(larry[2], ":")
 			a.Ip, a.Port = dest[0], dest[1]
+
+			log.Println(len(larry))
+			if len(larry) == 6 {
+				a.MgmtPort = larry[5]
+			} else {
+				a.MgmtPort = a.Port
+			}
+
 			temp_avail = append(temp_avail, a)
 		}
 	}
