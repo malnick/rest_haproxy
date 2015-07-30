@@ -8,6 +8,7 @@ import (
 	//"net/http"
 	"os"
 	"regexp"
+	"strings"
 )
 
 type Available struct {
@@ -17,7 +18,7 @@ type Available struct {
 }
 
 type Services struct {
-	Servers []string //[]Availablei
+	Servers []Available
 }
 
 //func (services *Services) AddServer(available Available) []Available {
@@ -27,7 +28,8 @@ type Services struct {
 
 func parsefile(filename string) (*Services, error) {
 	// Temp array
-	var temp []string
+	var temp_avail []Available
+	var a Available
 	// Define our regex to parse
 	regex, err := regexp.Compile(`^\s*server`)
 	if err != nil {
@@ -44,17 +46,26 @@ func parsefile(filename string) (*Services, error) {
 		log.Println(line)
 		if regex.MatchString(line) {
 			log.Println("Matched: %s\n", line)
-			temp = append(temp, line)
+
+			larry := strings.Split(line, " ")
+
+			a.Name = larry[1]
+
+			dest := strings.Split(larry[2], ":")
+
+			a.Ip, a.Port = dest[0], dest[1]
+
+			temp_avail = append(temp_avail, a)
 		}
 	}
 
 	return &Services{
-			Servers: temp,
+			Servers: temp_avail,
 		},
 		nil
 }
 
 func main() {
-	parsefile("/etc/haproxy/haproxy.cfg")
-	//log.Println(avail)
+	avail, _ := parsefile("/etc/haproxy/haproxy.cfg")
+	log.Println(avail)
 }
