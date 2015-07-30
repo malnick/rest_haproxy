@@ -2,10 +2,10 @@ package main
 
 import (
 	"bufio"
-	//"encoding/json"
+	"encoding/json"
 	//"io/ioutil"
 	"log"
-	//"net/http"
+	"net/http"
 	"os"
 	"regexp"
 	"strings"
@@ -20,11 +20,6 @@ type Available struct {
 type Services struct {
 	Servers []Available
 }
-
-//func (services *Services) AddServer(available Available) []Available {
-//	services.Servers = append(services.Servers, available)
-//	return services.Servers
-//}
 
 func parsefile(filename string) (*Services, error) {
 	// Temp array
@@ -46,15 +41,10 @@ func parsefile(filename string) (*Services, error) {
 		log.Println(line)
 		if regex.MatchString(line) {
 			log.Println("Matched: %s\n", line)
-
 			larry := strings.Split(line, " ")
-
 			a.Name = larry[1]
-
 			dest := strings.Split(larry[2], ":")
-
 			a.Ip, a.Port = dest[0], dest[1]
-
 			temp_avail = append(temp_avail, a)
 		}
 	}
@@ -65,7 +55,17 @@ func parsefile(filename string) (*Services, error) {
 		nil
 }
 
+func response(rw http.ResponseWriter, request *http.Request) {
+	services, err := parsefile("/etc/haproxy/haproxy.cfg")
+	if err != nil {
+		log.Println("ERROR: ", err)
+	}
+	json, err := json.Marshal(services)
+	rw.Write([]byte(json))
+}
+
 func main() {
-	avail, _ := parsefile("/etc/haproxy/haproxy.cfg")
-	log.Println(avail)
+	//avail, _ := parsefile("/etc/haproxy/haproxy.cfg")
+	http.HandleFunc("/services", response)
+	http.ListenAndServe(":3000", nil)
 }
