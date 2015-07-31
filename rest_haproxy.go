@@ -10,36 +10,20 @@ import (
 	"strings"
 )
 
-type Backend map[string]interface{}
 
-type Backends struct {
-	Services []Backend
+type Backend struct {
+	Ip string
+	Port string
 }
 
 type Services struct {
-	Available []Backends
+	Available []Backend
 }
 
-func get_backend(line string) *Backends {
-	// Define our regex to parse
-	match_bkend, err := regexp.Compile(`^\s*backend`)
-	if err != nil {
-		return "there was a problem with the regular expression."
-	}
-	if match_bkend.MatchString(line) {
-		log.Println("MATCHED BACKEND: ", line)
-		larry := strings.Fields(line)
-		name := larry[1]
-		return name
-		//backend := make(map[string]string)
-		//backend[name] = ""
-	}
-	return name
-}
+var backends []Backend
+backend = make(map[string]Backend)
 
 func parsefile(filename string) (*Services, error) {
-	// Backend Array Defined
-	var backends []map[string]map[string]string
 
 	// Regex for Server
 	match_srv, err := regexp.Compile(`^\s*server`)
@@ -47,42 +31,54 @@ func parsefile(filename string) (*Services, error) {
 		return nil, err // there was a problem with the regular expression.
 	}
 
+	// Regex for Backend
+	match_bkend, err := regexp.Compile(`^\s*backend`)
+	if err != nil {
+		return "there was a problem with the regular expression."
+	}
+
+	// Handle the file
 	inFile, _ := os.Open(filename)
 	defer inFile.Close()
 	scanner := bufio.NewScanner(inFile)
 	scanner.Split(bufio.ScanLines)
 
-	// Get Backends
+	// For each line in the file...
 	for scanner.Scan() {
 		line := scanner.Text()
-		current_backend := get_backend(line)
-		log.Println("BACKEND: ", current_backend)
 
-		backend := make(map[string]map[string]string)
-
-		if match_srv.MatchString(line) {
-			log.Println("MATCHED SERVER:\n", line)
+		if match_bkend.MatchString(line) {
+			log.Println("MATCHED BACKEND: ", line)
 			larry := strings.Fields(line)
-			log.Println("LENGTH: ", len(larry))
-			dest := strings.Split(larry[2], ":")
-			ip := dest[0]
-			port := dest[1]
-			mgmt := ""
-			if len(larry) == 6 {
-				mgmt := larry[5]
-				log.Println("MGMT: ", mgmt)
-			} else {
-				mgmt := port
-				log.Println("MGMT Set to SVC PORT: ", mgmt)
-			}
-			log.Println("IP: ", ip)
-			log.Println("MGMT: ", mgmt)
-			log.Println("PORT: ", port)
-
-			backend[current_backend][ip] = ip
-			backend[current_backend][port] = port
-			backend[current_backend][mgmt] = mgmt
+			name := larry[1]
+			backend[name] = Backend{}
 			backends = append(backends, backend)
+			for scanner.Scan() {
+				line := scanner.Text()
+				if match_bkend.MatchString(line) {
+					break
+				} else {
+					if match_srv.MatchString(line){
+						log.Println("MATCHED SERVER:\n", line)
+						larry := strings.Fields(line)
+						log.Println("LENGTH: ", len(larry))
+						dest := strings.Split(larry[2], ":")
+						ip := dest[0]
+						port := dest[1]
+						mgmt := ""
+						if len(larry) == 6 {
+							mgmt := larry[5]
+							log.Println("MGMT: ", mgmt)
+						} else {
+							mgmt := port
+							log.Println("MGMT Set to SVC PORT: ", mgmt)
+						}
+						log.Println("IP: ", ip)
+						log.Println("MGMT: ", mgmt)
+						log.Println("PORT: ", port)
+					}		
+				}
+			}
 		}
 	}
 
