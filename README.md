@@ -46,7 +46,58 @@ backend other_service
 Will result in the following JSON endpoint available at: ```localhost:3000/services```
 
 ```json
-{"Servers":[{"Name":"service-01","Ip":"10.0.1.10","Port":"31501","MgmtPort":"32501"},{"Name":"service-02","Ip":"10.0.1.10","Port":"21502","MgmtPort":"32502"},{"Name":"service-03","Ip":"10.0.2.10","Port":"31500","MgmtPort":"32501"},{"Name":"service-04","Ip":"10.0.2.11","Port":"31500","MgmtPort":"32502"},{"Name":"service-01","Ip":"10.0.5.10","Port":"31501","MgmtPort":"31501"},{"Name":"service-02","Ip":"10.0.5.10","Port":"21502","MgmtPort":"21502"},{"Name":"service-03","Ip":"10.0.5.10","Port":"31503","MgmtPort":"31503"},{"Name":"service-04","Ip":"10.0.5.11","Port":"31500","MgmtPort":"31500"}]}
+{
+  "Servers": [
+    {
+      "Name": "service-01",
+      "Ip": "10.0.1.10",
+      "Port": "31501",
+      "MgmtPort": "32501"
+    },
+    {
+      "Name": "service-02",
+      "Ip": "10.0.1.10",
+      "Port": "21502",
+      "MgmtPort": "32502"
+    },
+    {
+      "Name": "service-03",
+      "Ip": "10.0.2.10",
+      "Port": "31500",
+      "MgmtPort": "32501"
+    },
+    {
+      "Name": "service-04",
+      "Ip": "10.0.2.11",
+      "Port": "31500",
+      "MgmtPort": "32502"
+    },
+    {
+      "Name": "service-01",
+      "Ip": "10.0.5.10",
+      "Port": "31501",
+      "MgmtPort": "31501"
+    },
+    {
+      "Name": "service-02",
+      "Ip": "10.0.5.10",
+      "Port": "21502",
+      "MgmtPort": "21502"
+    },
+    {
+      "Name": "service-03",
+      "Ip": "10.0.5.10",
+      "Port": "31503",
+      "MgmtPort": "31503"
+    },
+    {
+      "Name": "service-04",
+      "Ip": "10.0.5.11",
+      "Port": "31500",
+      "MgmtPort": "31500"
+    }
+  ]
+}
 ```
 
 
