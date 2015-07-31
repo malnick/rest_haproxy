@@ -44,6 +44,9 @@ func parsefile(filename string) (*Services, error) {
 			larry := strings.Split(line, " ")
 			log.Println("LENGTH: ", len(larry))
 			log.Println("THE ARRY: ", larry)
+			for v := range larry {
+				log.Println("ELEMENT: ", larry[v], v)
+			}
 			log.Println("NAME: ", larry[1])
 			a.Name = larry[1]
 			dest := strings.Split(larry[2], ":")
