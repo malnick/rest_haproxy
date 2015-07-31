@@ -42,6 +42,7 @@ func parsefile(filename string) (*Services, error) {
 		if regex.MatchString(line) {
 			log.Println("MATCHED:\n", line)
 			larry := strings.Split(line, " ")
+			log.Println("THE ARRY: ".larry)
 			log.Println("NAME: ", larry[1])
 			a.Name = larry[1]
 			dest := strings.Split(larry[2], ":")
