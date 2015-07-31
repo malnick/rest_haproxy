@@ -10,17 +10,25 @@ import (
 	"strings"
 )
 
-type Services struct {
-	Available []map[string]string
+type Backend map[string]interface{}
+
+type Backends struct {
+	Services []Backend
 }
 
-func get_backend(line string) (name string) {
+type Services struct {
+	Available []Backends
+}
+
+func get_backend(line string) *Backends {
 	// Define our regex to parse
 	match_bkend, err := regexp.Compile(`^\s*backend`)
+	if err != nil {
+		return "there was a problem with the regular expression."
+	}
 	if match_bkend.MatchString(line) {
 		log.Println("MATCHED BACKEND: ", line)
 		larry := strings.Fields(line)
-		log.Println("BACKEND: ", larry[1])
 		name := larry[1]
 		return name
 		//backend := make(map[string]string)
@@ -44,9 +52,12 @@ func parsefile(filename string) (*Services, error) {
 	scanner := bufio.NewScanner(inFile)
 	scanner.Split(bufio.ScanLines)
 
+	// Get Backends
 	for scanner.Scan() {
 		line := scanner.Text()
 		current_backend := get_backend(line)
+		log.Println("BACKEND: ", current_backend)
+
 		backend := make(map[string]map[string]string)
 
 		if match_srv.MatchString(line) {
@@ -56,12 +67,13 @@ func parsefile(filename string) (*Services, error) {
 			dest := strings.Split(larry[2], ":")
 			ip := dest[0]
 			port := dest[1]
+			mgmt := ""
 			if len(larry) == 6 {
 				mgmt := larry[5]
 				log.Println("MGMT: ", mgmt)
 			} else {
-				mgmt := dest[1]
-				log.Println("MGMT: ", mgmt)
+				mgmt := port
+				log.Println("MGMT Set to SVC PORT: ", mgmt)
 			}
 			log.Println("IP: ", ip)
 			log.Println("MGMT: ", mgmt)
