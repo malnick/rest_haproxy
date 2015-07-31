@@ -10,20 +10,18 @@ import (
 	"strings"
 )
 
-
-type Backend struct {
-	Ip string
-	Port string
-}
-
 type Services struct {
 	Available []Backend
 }
 
-var backends []Backend
-backend = make(map[string]Backend)
+type Backend struct {
+	Ip   string
+	Port string
+}
 
 func parsefile(filename string) (*Services, error) {
+	backend := make(map[string]Backend)
+	var backends []Backend
 
 	// Regex for Server
 	match_srv, err := regexp.Compile(`^\s*server`)
@@ -34,7 +32,7 @@ func parsefile(filename string) (*Services, error) {
 	// Regex for Backend
 	match_bkend, err := regexp.Compile(`^\s*backend`)
 	if err != nil {
-		return "there was a problem with the regular expression."
+		return nil, err
 	}
 
 	// Handle the file
@@ -52,13 +50,13 @@ func parsefile(filename string) (*Services, error) {
 			larry := strings.Fields(line)
 			name := larry[1]
 			backend[name] = Backend{}
-			backends = append(backends, backend)
+			backends = append(backends, backend[name])
 			for scanner.Scan() {
 				line := scanner.Text()
 				if match_bkend.MatchString(line) {
 					break
 				} else {
-					if match_srv.MatchString(line){
+					if match_srv.MatchString(line) {
 						log.Println("MATCHED SERVER:\n", line)
 						larry := strings.Fields(line)
 						log.Println("LENGTH: ", len(larry))
@@ -76,7 +74,7 @@ func parsefile(filename string) (*Services, error) {
 						log.Println("IP: ", ip)
 						log.Println("MGMT: ", mgmt)
 						log.Println("PORT: ", port)
-					}		
+					}
 				}
 			}
 		}
