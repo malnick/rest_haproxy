@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	//"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -11,23 +10,29 @@ import (
 	"strings"
 )
 
-type Available struct {
-	Name     string
-	Ip       string
-	Port     string
+type Processes struct {
+	Ip string
+	Port string
 	MgmtPort string
 }
 
+type Available struct {
+	Name []Processes 
+}
+
 type Services struct {
-	Servers []Available
+	Services []Available
 }
 
 func parsefile(filename string) (*Services, error) {
 	// Temp array
 	var temp_avail []Available
 	var a Available
+
 	// Define our regex to parse
-	regex, err := regexp.Compile(`^\s*server`)
+	match_bkend, err := regexp.Compile(`^\s*server`)
+	match_srv, err := regexp.Compile(`^\s*backend`)
+
 	if err != nil {
 		return nil, err // there was a problem with the regular expression.
 	}
@@ -39,12 +44,16 @@ func parsefile(filename string) (*Services, error) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		if regex.MatchString(line) {
-			log.Println("MATCHED:\n", line)
+		if match_bkend.MatchString(line) {
+			var n Available
+			log.Println("MATCHED BACKEND: ", line)
+			n.Name := strings.Fields(line)[1]
+			continue
+		}
+		if match_srv.MatchString(line) {
+			log.Println("MATCHED SERVER:\n", line)
 			larry := strings.Fields(line)
 			log.Println("LENGTH: ", len(larry))
-			log.Println("NAME: ", larry[1])
-			a.Name = larry[1]
 			dest := strings.Split(larry[2], ":")
 			a.Ip, a.Port = dest[0], dest[1]
 			log.Println("IP: ", dest[0])
@@ -61,7 +70,7 @@ func parsefile(filename string) (*Services, error) {
 	}
 
 	return &Services{
-			Servers: temp_avail,
+			Services: temp_avail,
 		},
 		nil
 }
