@@ -11,13 +11,14 @@ import (
 )
 
 type Processes struct {
-	Ip string
-	Port string
+	Ip       string
+	Port     string
 	MgmtPort string
 }
 
 type Available struct {
-	Name []Processes 
+	Name string
+	Info []Processes
 }
 
 type Services struct {
@@ -25,9 +26,10 @@ type Services struct {
 }
 
 func parsefile(filename string) (*Services, error) {
-	// Temp array
-	var temp_avail []Available
-	var a Available
+	var a_arry []Available
+	var p_arry []Processes
+	a := new(Available)
+	proc := new(Processes)
 
 	// Define our regex to parse
 	match_bkend, err := regexp.Compile(`^\s*server`)
@@ -42,12 +44,15 @@ func parsefile(filename string) (*Services, error) {
 	scanner := bufio.NewScanner(inFile)
 	scanner.Split(bufio.ScanLines)
 
+	//	Loop:
 	for scanner.Scan() {
 		line := scanner.Text()
 		if match_bkend.MatchString(line) {
-			var n Available
 			log.Println("MATCHED BACKEND: ", line)
-			n.Name := strings.Fields(line)[1]
+			larry := strings.Fields(line)
+			// Define a new backend
+			backend := larry[1]
+			a.Name = backend
 			continue
 		}
 		if match_srv.MatchString(line) {
@@ -55,22 +60,25 @@ func parsefile(filename string) (*Services, error) {
 			larry := strings.Fields(line)
 			log.Println("LENGTH: ", len(larry))
 			dest := strings.Split(larry[2], ":")
-			a.Ip, a.Port = dest[0], dest[1]
+			proc.Ip = larry[2]
+			port := dest[1]
 			log.Println("IP: ", dest[0])
 			log.Println("PORT: ", dest[1])
 			if len(larry) == 6 {
-				a.MgmtPort = larry[5]
+				proc.MgmtPort = larry[5]
 			} else {
-				a.MgmtPort = a.Port
+				proc.MgmtPort = proc.Port
 			}
-			log.Println("MGMT PORT: ", a.MgmtPort)
+			log.Println("MGMT PORT: ", proc.MgmtPort)
 
-			temp_avail = append(temp_avail, a)
+			p_arry = append(p_arry, proc)
+			a.Info = append(a.Info, p_arry)
+			continue
 		}
 	}
 
 	return &Services{
-			Services: temp_avail,
+			Services: a_arry,
 		},
 		nil
 }
