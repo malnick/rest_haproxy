@@ -10,26 +10,15 @@ import (
 	"strings"
 )
 
-type Processes struct {
-	Ip       string
-	Port     string
-	MgmtPort string
+type Backend struct {
+	Name      string
+	Endpoints []string
 }
 
-type Available struct {
-	Name string
-	Info []Processes
-}
-
-type Services struct {
-	Services []Available
-}
-
-func parsefile(filename string) (*Services, error) {
-	var a_arry []Available
-	var p_arry []Processes
-	a := new(Available)
-	proc := new(Processes)
+func parsefile(filename string) (backends, error) {
+	// Backend Array Defined
+	var backends []*Backend
+	endpoints := make(map[string][]*Backend)
 
 	// Define our regex to parse
 	match_bkend, err := regexp.Compile(`^\s*server`)
@@ -47,38 +36,38 @@ func parsefile(filename string) (*Services, error) {
 	//	Loop:
 	for scanner.Scan() {
 		line := scanner.Text()
-		if match_bkend.MatchString(line) {
-			log.Println("MATCHED BACKEND: ", line)
-			larry := strings.Fields(line)
-			// Define a new backend
-			backend := larry[1]
-			a.Name = backend
-			continue
-		}
-		if match_srv.MatchString(line) {
-			log.Println("MATCHED SERVER:\n", line)
-			larry := strings.Fields(line)
-			log.Println("LENGTH: ", len(larry))
-			dest := strings.Split(larry[2], ":")
-			proc.Ip = larry[2]
-			port := dest[1]
-			log.Println("IP: ", dest[0])
-			log.Println("PORT: ", dest[1])
-			if len(larry) == 6 {
-				proc.MgmtPort = larry[5]
-			} else {
-				proc.MgmtPort = proc.Port
+		for _, b := range backends {
+			if match_bkend.MatchString(line) {
+				log.Println("MATCHED BACKEND: ", line)
+				larry := strings.Fields(line)
+				b.Name = larry[1]
+				for _, e := range b.Endpoints {
+					if match_srv.MatchString(line) {
+						log.Println("MATCHED SERVER:\n", line)
+						larry := strings.Fields(line)
+						log.Println("LENGTH: ", len(larry))
+						dest := strings.Split(larry[2], ":")
+						ip := dest[0]
+						port := dest[1]
+						if len(larry) == 6 {
+							mgmt := larry[5]
+						} else {
+							mgmt := port
+						}
+						endpoint := ip + ":" + mgmt
+						log.Println("IP: ", ip)
+						log.Println("MGMT: ", mgmt)
+						log.Println("PORT: ", port)
+						log.Println("ENDPOINT ", endpoint)
+						endpoints[e] = append(endpoints[e], b)
+					}
+				}
 			}
-			log.Println("MGMT PORT: ", proc.MgmtPort)
-
-			p_arry = append(p_arry, proc)
-			a.Info = append(a.Info, p_arry)
-			continue
 		}
 	}
 
 	return &Services{
-			Services: a_arry,
+			Services: backends,
 		},
 		nil
 }
