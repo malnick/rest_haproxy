@@ -41,16 +41,8 @@ func parsefile(filename string) (*Services, error) {
 		line := scanner.Text()
 		if regex.MatchString(line) {
 			log.Println("MATCHED:\n", line)
-			//larry := strings.Split(line, " ")
 			larry := strings.Fields(line)
 			log.Println("LENGTH: ", len(larry))
-			log.Println("THE ARRY: ", larry)
-			for v := range larry {
-				log.Println("ELEMENT: ", larry[v], v)
-				if larry[v] == "" {
-					larry = append(larry[:v], larry[v+1:]...)
-				}
-			}
 			log.Println("NAME: ", larry[1])
 			a.Name = larry[1]
 			dest := strings.Split(larry[2], ":")
