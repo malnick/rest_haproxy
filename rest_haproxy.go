@@ -46,6 +46,9 @@ func parsefile(filename string) (*Services, error) {
 			log.Println("THE ARRY: ", larry)
 			for v := range larry {
 				log.Println("ELEMENT: ", larry[v], v)
+				if larry[v] == " " {
+					larry = append(larry[:v], larry[v+1]...)
+				}
 			}
 			log.Println("NAME: ", larry[1])
 			a.Name = larry[1]
