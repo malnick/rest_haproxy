@@ -42,6 +42,7 @@ func parsefile(filename string) (*Services, error) {
 		if regex.MatchString(line) {
 			log.Println("MATCHED:\n", line)
 			larry := strings.Split(line, " ")
+			log.Println("LENGTH: ", len(larry))
 			log.Println("THE ARRY: ", larry)
 			log.Println("NAME: ", larry[1])
 			a.Name = larry[1]
@@ -49,7 +50,6 @@ func parsefile(filename string) (*Services, error) {
 			a.Ip, a.Port = dest[0], dest[1]
 			log.Println("IP: ", dest[0])
 			log.Println("PORT: ", dest[1])
-			log.Println(len(larry))
 			if len(larry) == 6 {
 				a.MgmtPort = larry[5]
 			} else {
