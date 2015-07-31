@@ -10,16 +10,13 @@ import (
 	"strings"
 )
 
-type Backend map[string]interface{}
-
 type Services struct {
-	Available []Backend
+	Available []map[string]string
 }
 
 func parsefile(filename string) (*Services, error) {
 	// Backend Array Defined
-	var backend Backend
-	var backends []Backend
+	var backends []map[string]string
 
 	// Define our regex to parse
 	match_bkend, err := regexp.Compile(`^\s*backend`)
@@ -38,12 +35,12 @@ func parsefile(filename string) (*Services, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if match_bkend.MatchString(line) {
-
 			log.Println("MATCHED BACKEND: ", line)
 			larry := strings.Fields(line)
 			log.Println("BACKEND: ", larry[1])
 			name := larry[1]
-			backend := make(map[strings(name)]string)
+			backend := make(map[string]string)
+			backend[name] = ""
 			backends = append(backends, backend)
 		}
 		//			if match_srv.MatchString(line) {
