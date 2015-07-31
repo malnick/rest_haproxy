@@ -31,7 +31,7 @@ func get_backend(line string) (name string) {
 
 func parsefile(filename string) (*Services, error) {
 	// Backend Array Defined
-	var backends []map[string][]string
+	var backends []map[string]map[string]string
 
 	// Regex for Server
 	match_srv, err := regexp.Compile(`^\s*server`)
@@ -63,12 +63,9 @@ func parsefile(filename string) (*Services, error) {
 				mgmt := dest[1]
 				log.Println("MGMT: ", mgmt)
 			}
-			//endpoint := strings.Join([]strings{ip, ":", mgmt})
 			log.Println("IP: ", ip)
 			log.Println("MGMT: ", mgmt)
 			log.Println("PORT: ", port)
-			//log.Println("ENDPOINT ", endpoint)
-			//endpoints[e] = append(endpoints[e], b)
 
 			backend[current_backend][ip] = ip
 			backend[current_backend][port] = port
