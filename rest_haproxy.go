@@ -39,21 +39,22 @@ func parsefile(filename string) (*Services, error) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		log.Println(line)
 		if regex.MatchString(line) {
-			log.Println("Matched: %s\n", line)
+			log.Println("MATCHED:\n", line)
 			larry := strings.Split(line, " ")
+			log.Println("NAME: ", larry[1])
 			a.Name = larry[1]
-
 			dest := strings.Split(larry[2], ":")
 			a.Ip, a.Port = dest[0], dest[1]
-
+			log.Println("IP: ", dest[0])
+			log.Println("PORT: ", dest[1])
 			log.Println(len(larry))
 			if len(larry) == 6 {
 				a.MgmtPort = larry[5]
 			} else {
 				a.MgmtPort = a.Port
 			}
+			log.Println("MGMT PORT: ", a.MgmtPort)
 
 			temp_avail = append(temp_avail, a)
 		}
@@ -75,7 +76,6 @@ func response(rw http.ResponseWriter, request *http.Request) {
 }
 
 func main() {
-	//avail, _ := parsefile("/etc/haproxy/haproxy.cfg")
 	http.HandleFunc("/services", response)
 	http.ListenAndServe(":3000", nil)
 }
