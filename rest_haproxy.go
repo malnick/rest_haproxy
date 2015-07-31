@@ -10,15 +10,16 @@ import (
 	"strings"
 )
 
-type Backend struct {
-	Name      string
-	Endpoints []string
+type Backend map[string]interface{}
+
+type Services struct {
+	Available []Backend
 }
 
-func parsefile(filename string) (backends, error) {
+func parsefile(filename string) (*Services, error) {
 	// Backend Array Defined
-	var backends []*Backend
-	endpoints := make(map[string][]*Backend)
+	var backend *Backend
+	var backends []Backend
 
 	// Define our regex to parse
 	match_bkend, err := regexp.Compile(`^\s*server`)
@@ -36,38 +37,41 @@ func parsefile(filename string) (backends, error) {
 	//	Loop:
 	for scanner.Scan() {
 		line := scanner.Text()
-		for _, b := range backends {
-			if match_bkend.MatchString(line) {
-				log.Println("MATCHED BACKEND: ", line)
-				larry := strings.Fields(line)
-				b.Name = larry[1]
-				for _, e := range b.Endpoints {
-					if match_srv.MatchString(line) {
-						log.Println("MATCHED SERVER:\n", line)
-						larry := strings.Fields(line)
-						log.Println("LENGTH: ", len(larry))
-						dest := strings.Split(larry[2], ":")
-						ip := dest[0]
-						port := dest[1]
-						if len(larry) == 6 {
-							mgmt := larry[5]
-						} else {
-							mgmt := port
-						}
-						endpoint := ip + ":" + mgmt
-						log.Println("IP: ", ip)
-						log.Println("MGMT: ", mgmt)
-						log.Println("PORT: ", port)
-						log.Println("ENDPOINT ", endpoint)
-						endpoints[e] = append(endpoints[e], b)
-					}
-				}
-			}
+		if match_bkend.MatchString(line) {
+
+			log.Println("MATCHED BACKEND: ", line)
+			larry := strings.Fields(line)
+			log.Println("BACKEND: ", larry[1])
+			backend[larry[1]] = make(map[string]string)
+			backends = append(backends, backend)
+		}
+		if match_srv.MatchString(line) {
+			log.Println("MATCHED SERVER:\n", line)
+			//			larry := strings.Fields(line)
+			//			log.Println("LENGTH: ", len(larry))
+			//			dest := strings.Split(larry[2], ":")
+			//			ip := dest[0]
+			//			port := dest[1]
+			//			if len(larry) == 6 {
+			//				mgmt := larry[5]
+			//				log.Println("MGMT: ", mgmt)
+			//			} else {
+			//				mgmt := port
+			//				log.Println("MGMT: ", mgmt)
+			//			}
+			//			//endpoint := strings.Join([]strings{ip, ":", mgmt})
+			//			log.Println("IP: ", ip)
+			//			//log.Println("MGMT: ", mgmt)
+			//			log.Println("PORT: ", port)
+			//			//log.Println("ENDPOINT ", endpoint)
+			//			endpoints[e] = append(endpoints[e], b)
+			//		}
+			//	}
 		}
 	}
 
 	return &Services{
-			Services: backends,
+			service: backends,
 		},
 		nil
 }
