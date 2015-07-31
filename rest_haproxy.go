@@ -18,7 +18,7 @@ type Services struct {
 
 func parsefile(filename string) (*Services, error) {
 	// Backend Array Defined
-	var backend *Backend
+	var backend Backend
 	var backends []Backend
 
 	// Define our regex to parse
@@ -71,7 +71,7 @@ func parsefile(filename string) (*Services, error) {
 	}
 
 	return &Services{
-			service: backends,
+			Available: backends,
 		},
 		nil
 }
