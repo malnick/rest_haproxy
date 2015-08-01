@@ -67,23 +67,34 @@ func parsefile(filename string) (s Services, err error) {
 		backend_name, _ := getBackend(line)
 		server_ip, _ := getIp(line)
 
+		//if backend_name != "null" {
+		//	s.Service[backend_name] = []string{}
+		//	continue
+		//} else if server_ip != "null" {
+		//	s.Service[backend_name] = append(s.Service[backend_name], server_ip)
+		//	continue
+		//}
 		if backend_name != "null" {
+			// Add new backend
 			s.Service[backend_name] = []string{}
-			continue
-		} else if server_ip != "null" {
-			s.Service[backend_name] = append(s.Service[backend_name], server_ip)
-			continue
+			// Start sub process to get servers
+			for scanner.Scan() {
+				line := scanner.Text()
+				// Break sub process when new backend is found
+				check_backend,_ := getBackend(line
+				if check_backend != "null" {
+					if check_backend != backend_name {
+						log.Println("BREADING SUB PROCESS")
+						break
+					}
+				}
+				if server_ip != "null" {
+					s.Service[backend_name] = append(s.Service[backend_name], server_ip)
+
+				}
+			}
 		}
 	}
-	// Only pass current backend then THROW
-	//check_backend, _ := getBackend(line)
-	//if check_backend != "null" {
-	//	if backend_name != check_backend {
-	//		log.Println("BREAKING INNER LOOP")
-	//		break
-	//	} else {
-	//		continue
-	//	}
 
 	log.Println("Final Hash:\n")
 	log.Println(s)
