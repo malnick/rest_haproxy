@@ -62,18 +62,12 @@ func parsefile(filename string) (s Services, err error) {
 	scanner.Split(bufio.ScanLines)
 
 	// Create backends array
+
+OUTER:
 	for scanner.Scan() {
 		line := scanner.Text()
 		backend_name, _ := getBackend(line)
-		server_ip, _ := getIp(line)
 
-		//if backend_name != "null" {
-		//	s.Service[backend_name] = []string{}
-		//	continue
-		//} else if server_ip != "null" {
-		//	s.Service[backend_name] = append(s.Service[backend_name], server_ip)
-		//	continue
-		//}
 		if backend_name != "null" {
 			// Add new backend
 			s.Service[backend_name] = []string{}
@@ -81,16 +75,17 @@ func parsefile(filename string) (s Services, err error) {
 			for scanner.Scan() {
 				line := scanner.Text()
 				// Break sub process when new backend is found
-				check_backend,_ := getBackend(line
+				check_backend, _ := getBackend(line)
+				log.Println("CHECK ", check_backend, backend_name)
 				if check_backend != "null" {
 					if check_backend != backend_name {
-						log.Println("BREADING SUB PROCESS")
-						break
+						log.Println("BREAKING SUB PROCESS")
+						continue OUTER
 					}
 				}
+				server_ip, _ := getIp(line)
 				if server_ip != "null" {
 					s.Service[backend_name] = append(s.Service[backend_name], server_ip)
-
 				}
 			}
 		}
