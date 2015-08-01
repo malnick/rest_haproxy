@@ -10,9 +10,7 @@ import (
 	"strings"
 )
 
-type Backends struct {
-	Name map[Backend]string
-}
+type Backends map[string]interface{}
 
 type Backend struct {
 	Ip string
@@ -55,10 +53,9 @@ func getIp(line string) (ip string, err error) {
 	return ip, nil
 }
 
-func parsefile(filename string) (backends Backends, err error) {
+func parsefile(filename string) (Backends, error) {
 
-	backends = make(map[Backend]string)
-
+	var backends Backends
 	backend := make(map[Backend]string)
 
 	// Handle the file
@@ -69,16 +66,22 @@ func parsefile(filename string) (backends Backends, err error) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		backend_name, _ := getBackend(line)
-		server_ip, _ := getIp(line)
-		log.Println(server_ip)
+		backend_name, err := getBackend(line)
+		if err != nil {
+			for scanner.Scan() {
+				_, err := getBackend(line)
+				if err == nil {
+					server_ip, _ := getIp(line)
+					log.Println(server_ip)
 
-		backend[Backend{Ip: server_ip}]
+					backends[backend_name] = backend[Backend{Ip: server_ip}]
 
-		backends[Backends{backend_name}] = backend
-
-		log.Println("Backends Hash:\n")
-		log.Println(backends)
+					log.Println("Backends Hash:\n")
+					log.Println(backends)
+					continue
+				}
+			}
+		}
 	}
 
 	log.Println("Final Hash:\n")
