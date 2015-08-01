@@ -71,13 +71,8 @@ func parsefile(filename string) (Backends, error) {
 		if backend_name != "null" {
 			for scanner.Scan() {
 
-				// Only pass current backend then THROW
-				check_backend, _ := getBackend(line)
-				if backends[backend_name] != check_backend {
-					break
-				}
-
 				server_ip, _ := getIp(line)
+
 				if server_ip != "null" {
 
 					log.Println("Server: ", server_ip)
@@ -86,9 +81,13 @@ func parsefile(filename string) (Backends, error) {
 					log.Println(backends)
 					continue
 
-				} else {
-					continue
+				}
 
+				// Only pass current backend then THROW
+				check_backend, _ := getBackend(line)
+				if backends[backend_name] != check_backend {
+					log.Println("BREAKING INNER LOOP")
+					break
 				}
 			}
 		}
