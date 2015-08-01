@@ -33,7 +33,7 @@ func getBackend(line string) (backend string, err error) {
 		return backend, nil
 	}
 
-	return backend, nil
+	return "null", nil
 }
 
 func getIp(line string) (ip string, err error) {
@@ -50,7 +50,7 @@ func getIp(line string) (ip string, err error) {
 		log.Println(ip)
 		return ip, nil
 	}
-	return ip, nil
+	return "null", nil
 }
 
 func parsefile(filename string) (Backends, error) {
@@ -66,24 +66,29 @@ func parsefile(filename string) (Backends, error) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		backend_name, err := getBackend(line)
-		if err != nil {
+		backend_name, _ := getBackend(line)
+		log.Println("LINE ", line)
+		if backend_name != "null" {
 			for scanner.Scan() {
-				_, err := getBackend(line)
-				if err == nil {
-					server_ip, err := getIp(line)
-					if err != nil {
-						log.Println("Server: ", server_ip)
-						backends[backend_name] = backend[Backend{Ip: server_ip}]
-					}
 
-					//backends[backend_name] = backend[Backend{Ip: server_ip}]
+				// Only pass current backend then THROW
+				check_backend, _ := getBackend(line)
+				if backends[backend_name] != check_backend {
+					break
+				}
 
+				server_ip, _ := getIp(line)
+				if server_ip != "null" {
+
+					log.Println("Server: ", server_ip)
+					backends[backend_name] = backend[Backend{Ip: server_ip}]
 					log.Println("Backends Hash:\n")
 					log.Println(backends)
 					continue
+
 				} else {
 					continue
+
 				}
 			}
 		}
