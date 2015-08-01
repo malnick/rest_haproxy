@@ -71,13 +71,18 @@ func parsefile(filename string) (Backends, error) {
 			for scanner.Scan() {
 				_, err := getBackend(line)
 				if err == nil {
-					server_ip, _ := getIp(line)
-					log.Println(server_ip)
+					server_ip, err := getIp(line)
+					if err != nil {
+						log.Println("Server: ", server_ip)
+						backends[backend_name] = backend[Backend{Ip: server_ip}]
+					}
 
-					backends[backend_name] = backend[Backend{Ip: server_ip}]
+					//backends[backend_name] = backend[Backend{Ip: server_ip}]
 
 					log.Println("Backends Hash:\n")
 					log.Println(backends)
+					continue
+				} else {
 					continue
 				}
 			}
