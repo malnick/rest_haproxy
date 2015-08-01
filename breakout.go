@@ -10,7 +10,11 @@ import (
 	"strings"
 )
 
-type Key struct {
+type Backends struct {
+	Name map[Backend]string
+}
+
+type Backend struct {
 	Ip string
 }
 
@@ -44,17 +48,18 @@ func getIp(line string) (ip string, err error) {
 	if match_srv.MatchString(line) {
 		log.Println("MATCHED SERVER:\n", line)
 		larry := strings.Fields(line)
-		log.Println("LENGTH: ", len(larry))
 		ip := larry[2]
-		//dest := strings.Split(larry[2], ":")
+		log.Println(ip)
 		return ip, nil
 	}
 	return ip, nil
 }
 
-func parsefile(filename string) (backends map[Key]string, err error) {
+func parsefile(filename string) (backends Backends, err error) {
 
-	backends = make(map[Key]string)
+	backends = make(map[Backend]string)
+
+	backend := make(map[Backend]string)
 
 	// Handle the file
 	inFile, _ := os.Open(filename)
@@ -64,12 +69,20 @@ func parsefile(filename string) (backends map[Key]string, err error) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		backend, _ := getBackend(line)
+		backend_name, _ := getBackend(line)
 		server_ip, _ := getIp(line)
+		log.Println(server_ip)
 
-		backends[Key{backend}] = server_ip
+		backend[Backend{Ip: server_ip}]
+
+		backends[Backends{backend_name}] = backend
+
+		log.Println("Backends Hash:\n")
+		log.Println(backends)
 	}
 
+	log.Println("Final Hash:\n")
+	log.Println(backends)
 	return backends, nil
 }
 
