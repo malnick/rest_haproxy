@@ -37,6 +37,7 @@ func parsefile(filename string) (*Services, error) {
 	scanner.Split(bufio.ScanLines)
 
 	// For each line in the file...
+OUTER:
 	for scanner.Scan() {
 		line := scanner.Text()
 		if match_bkend.MatchString(line) {
@@ -75,6 +76,8 @@ func parsefile(filename string) (*Services, error) {
 					}
 				}
 			}
+			log.Println("WORKING?????")
+			continue OUTER
 		}
 	}
 
