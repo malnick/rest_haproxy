@@ -65,21 +65,25 @@ func parsefile(filename string) (s Services, err error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		backend_name, _ := getBackend(line)
-		// Only pass current backend then THROW
-		//check_backend, _ := getBackend(line)
-		//if services[b] != check_backend {
-		//	log.Println("BREAKING INNER LOOP")
-		//	break
-		//}
+		server_ip, _ := getIp(line)
+
 		if backend_name != "null" {
 			s.Service[backend_name] = []string{}
-		} else {
+			continue
+		} else if server_ip != "null" {
+			s.Service[backend_name] = append(s.Service[backend_name], server_ip)
 			continue
 		}
 	}
-
-	// Create a map of maps of length len(backends)
-	//services = make([]map[string][]map[string][]string, len(backends))
+	// Only pass current backend then THROW
+	//check_backend, _ := getBackend(line)
+	//if check_backend != "null" {
+	//	if backend_name != check_backend {
+	//		log.Println("BREAKING INNER LOOP")
+	//		break
+	//	} else {
+	//		continue
+	//	}
 
 	log.Println("Final Hash:\n")
 	log.Println(s)
