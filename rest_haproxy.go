@@ -11,12 +11,12 @@ import (
 )
 
 type Services struct {
-	Available []map[string]map[string]string
+	Available []map[string]map[string][]string
 }
 
 func parsefile(filename string) (*Services, error) {
-	backend := make(map[string]map[string]string)
-	backends := []map[string]map[string]string{}
+	backend := make(map[string]map[string][]string)
+	backends := []map[string]map[string][]string{}
 
 	// Regex for Server
 	match_srv, err := regexp.Compile(`^\s*server`)
@@ -37,19 +37,19 @@ func parsefile(filename string) (*Services, error) {
 	scanner.Split(bufio.ScanLines)
 
 	// For each line in the file...
-OUTER:
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		if match_bkend.MatchString(line) {
 			log.Println("MATCHED BACKEND: ", line)
 			larry := strings.Fields(line)
 			name := larry[1]
-			backend[name] = make(map[string]string)
+			backend[name] = make(map[string][]string)
 			log.Println(backends)
 			for scanner.Scan() {
 				line := scanner.Text()
 				if match_bkend.MatchString(line) {
-					break
+					continue
 				} else {
 					if match_srv.MatchString(line) {
 						log.Println("MATCHED SERVER:\n", line)
@@ -58,26 +58,29 @@ OUTER:
 						dest := strings.Split(larry[2], ":")
 						ip := dest[0]
 						port := dest[1]
-						mgmt := ""
+						//mgmt := ""
 						if len(larry) == 6 {
 							mgmt := larry[5]
 							log.Println("MGMT: ", mgmt)
+							mgmt_ary := []string{ip, ":", mgmt}
+							backend[name]["mgmt"] = append(backend[name]["mgmt"], strings.Join(mgmt_ary, ""))
+
 						} else {
 							mgmt := port
 							log.Println("MGMT Set to SVC PORT: ", mgmt)
+							//backend[name]["mgmt"] = mgmt
 						}
 						//backend[name].Ip = ip
 						log.Println("IP: ", ip)
 						log.Println("PORT: ", port)
-						backend[name]["ip"] = ip
-						backend[name]["port"] = port
-						backend[name]["mgmt"] = mgmt
+						svc_ary := []string{ip, ":", port}
+						backend[name]["svc"] = append(backend[name]["ip"], strings.Join(svc_ary, ""))
 						backends = append(backends, backend)
 					}
+					continue
 				}
 			}
 			log.Println("WORKING?????")
-			continue OUTER
 		}
 	}
 
