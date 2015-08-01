@@ -10,13 +10,11 @@ import (
 	"strings"
 )
 
-//type Services struct {
-//	Available []map[string]map[string][]string
-//}
+type Services struct {
+	Available []map[string]map[string][]string
+}
 
-type Services map[string]interface{}
-
-func parsefile(filename string) (services Services, error) {
+func parsefile(filename string) (*Services, error) {
 	backend := make(map[string]map[string][]string)
 	backends := []map[string]map[string][]string{}
 
@@ -85,8 +83,11 @@ func parsefile(filename string) (services Services, error) {
 			log.Println("WORKING?????")
 		}
 	}
-	services = backends
-	return services, nil
+
+	return &Services{
+			Available: backends,
+		},
+		nil
 }
 
 func response(rw http.ResponseWriter, request *http.Request) {
