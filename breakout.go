@@ -10,10 +10,8 @@ import (
 	"strings"
 )
 
-type Backends map[string]interface{}
-
-type Backend struct {
-	Ip string
+type Services struct {
+	Service map[string][]string
 }
 
 func getBackend(line string) (backend string, err error) {
@@ -53,10 +51,9 @@ func getIp(line string) (ip string, err error) {
 	return "null", nil
 }
 
-func parsefile(filename string) (Backends, error) {
+func parsefile(filename string) (s Services, err error) {
 
-	var backends Backends
-	backend := make(map[Backend]string)
+	s.Service = make(map[string][]string)
 
 	// Handle the file
 	inFile, _ := os.Open(filename)
@@ -64,38 +61,29 @@ func parsefile(filename string) (Backends, error) {
 	scanner := bufio.NewScanner(inFile)
 	scanner.Split(bufio.ScanLines)
 
+	// Create backends array
 	for scanner.Scan() {
 		line := scanner.Text()
 		backend_name, _ := getBackend(line)
-		log.Println("LINE ", line)
+		// Only pass current backend then THROW
+		//check_backend, _ := getBackend(line)
+		//if services[b] != check_backend {
+		//	log.Println("BREAKING INNER LOOP")
+		//	break
+		//}
 		if backend_name != "null" {
-			for scanner.Scan() {
-
-				server_ip, _ := getIp(line)
-
-				if server_ip != "null" {
-
-					log.Println("Server: ", server_ip)
-					backends[backend_name] = backend[Backend{Ip: server_ip}]
-					log.Println("Backends Hash:\n")
-					log.Println(backends)
-					continue
-
-				}
-
-				// Only pass current backend then THROW
-				check_backend, _ := getBackend(line)
-				if backends[backend_name] != check_backend {
-					log.Println("BREAKING INNER LOOP")
-					break
-				}
-			}
+			s.Service[backend_name] = []string{}
+		} else {
+			continue
 		}
 	}
 
+	// Create a map of maps of length len(backends)
+	//services = make([]map[string][]map[string][]string, len(backends))
+
 	log.Println("Final Hash:\n")
-	log.Println(backends)
-	return backends, nil
+	log.Println(s)
+	return s, nil
 }
 
 func response(rw http.ResponseWriter, request *http.Request) {
