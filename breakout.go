@@ -21,7 +21,7 @@ func getBackend(line string) (backend string, err error) {
 	if err != nil {
 		return "Failed", err
 	}
-
+	log.Println("ATTEMPTED MATCH ON LINE FOR BACKEND: ", line)
 	if match_bkend.MatchString(line) {
 		log.Println("MATCHED BACKEND: ", line)
 		larry := strings.Fields(line)
@@ -82,6 +82,7 @@ OUTER:
 						log.Println("BREAKING SUB PROCESS")
 						continue OUTER
 					}
+					continue
 				}
 				server_ip, _ := getIp(line)
 				if server_ip != "null" {
