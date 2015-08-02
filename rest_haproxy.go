@@ -10,27 +10,60 @@ import (
 	"strings"
 )
 
-//type Services struct {
-//	Available []map[string]map[string][]string
-//}
+type Services struct {
+	Service map[string][]string
+}
 
-type Services map[string]interface{}
+type Store struct {
+	Name string
+}
 
-func parsefile(filename string) (services Services, error) {
-	backend := make(map[string]map[string][]string)
-	backends := []map[string]map[string][]string{}
+func (s Store) storedBackend() string {
+	return s.Name
+}
 
+func getBackend(line string) (backend string, err error) {
+
+	// Regex for Backend
+	match_bkend, err := regexp.Compile(`^\s*backend`)
+	if err != nil {
+		return "Failed", err
+	}
+	log.Println("ATTEMPTED MATCH ON LINE FOR BACKEND: ", line)
+	if match_bkend.MatchString(line) {
+		log.Println("MATCHED BACKEND: ", line)
+		larry := strings.Fields(line)
+		name := larry[1]
+		backend = name
+		log.Println(backend)
+		return backend, nil
+	}
+
+	return "null", nil
+}
+
+func getIp(line string) (ip string, err error) {
 	// Regex for Server
 	match_srv, err := regexp.Compile(`^\s*server`)
 	if err != nil {
-		return nil, err // there was a problem with the regular expression.
+		return "Failed.", err // there was a problem with the regular expression.
 	}
 
-	// Regex for Bmeackend
-	match_bkend, err := regexp.Compile(`^\s*backend`)
-	if err != nil {
-		return nil, err
+	if match_srv.MatchString(line) {
+		log.Println("MATCHED SERVER:\n", line)
+		larry := strings.Fields(line)
+		ip := larry[2]
+		log.Println(ip)
+		return ip, nil
 	}
+	return "null", nil
+}
+
+func parsefile(filename string) (s Services, err error) {
+
+	s.Service = make(map[string][]string)
+
+	var store Store
 
 	// Handle the file
 	inFile, _ := os.Open(filename)
@@ -38,55 +71,57 @@ func parsefile(filename string) (services Services, error) {
 	scanner := bufio.NewScanner(inFile)
 	scanner.Split(bufio.ScanLines)
 
-	// For each line in the file...
+	// Create backends array
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		if match_bkend.MatchString(line) {
-			log.Println("MATCHED BACKEND: ", line)
-			larry := strings.Fields(line)
-			name := larry[1]
-			backend[name] = make(map[string][]string)
-			log.Println(backends)
-			for scanner.Scan() {
-				line := scanner.Text()
-				if match_bkend.MatchString(line) {
-					continue
-				} else {
-					if match_srv.MatchString(line) {
-						log.Println("MATCHED SERVER:\n", line)
-						larry := strings.Fields(line)
-						log.Println("LENGTH: ", len(larry))
-						dest := strings.Split(larry[2], ":")
-						ip := dest[0]
-						port := dest[1]
-						//mgmt := ""
-						if len(larry) == 6 {
-							mgmt := larry[5]
-							log.Println("MGMT: ", mgmt)
-							mgmt_ary := []string{ip, ":", mgmt}
-							backend[name]["mgmt"] = append(backend[name]["mgmt"], strings.Join(mgmt_ary, ""))
-
-						} else {
-							mgmt := port
-							log.Println("MGMT Set to SVC PORT: ", mgmt)
-							//backend[name]["mgmt"] = mgmt
-						}
-						//backend[name].Ip = ip
-						log.Println("IP: ", ip)
-						log.Println("PORT: ", port)
-						svc_ary := []string{ip, ":", port}
-						backend[name]["svc"] = append(backend[name]["ip"], strings.Join(svc_ary, ""))
-						backends = append(backends, backend)
+		log.Println(line)
+		log.Println("STORED: ", store.Name)
+		if len(store.Name) == 0 {
+			backend_name, _ := getBackend(line)
+			if backend_name != "null" {
+				s.Service[backend_name] = []string{}
+				for scanner.Scan() {
+					line := scanner.Text()
+					check, _ := getBackend(line)
+					if check != "null" {
+						store.Name = check
+						break
 					}
-					continue
+					server_ip, _ := getIp(line)
+					if server_ip != "null" {
+						s.Service[backend_name] = append(s.Service[backend_name], server_ip)
+					}
 				}
 			}
-			log.Println("WORKING?????")
+		}
+		server_ip, _ := getIp(line)
+		if server_ip != "null" {
+			s.Service[store.Name] = append(s.Service[store.Name], server_ip)
 		}
 	}
-	services = backends
-	return services, nil
+
+	// Start sub process to get servers
+	//		for scanner.Scan() {
+	//			line := scanner.Text()
+	//			// Break sub process when new backend is found
+	//			check_backend, _ := getBackend(line)
+	///			log.Println("CHECK ", check_backend, backend_name)
+	//			if check_backend != "null" {
+	//				if check_backend != backend_name {
+	//					log.Println("BREAKING SUB PROCESS")
+	//					break
+	//				}
+	//				continue
+	//			}
+	///
+	//		}
+	//		}
+	//	}
+
+	log.Println("Final Hash:\n")
+	log.Println(s)
+	return s, nil
 }
 
 func response(rw http.ResponseWriter, request *http.Request) {
