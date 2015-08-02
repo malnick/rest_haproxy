@@ -14,6 +14,14 @@ type Services struct {
 	Service map[string][]string
 }
 
+type Store struct {
+	Name string
+}
+
+func (s Store) storedBackend() string {
+	return s.Name
+}
+
 func getBackend(line string) (backend string, err error) {
 
 	// Regex for Backend
@@ -55,6 +63,8 @@ func parsefile(filename string) (s Services, err error) {
 
 	s.Service = make(map[string][]string)
 
+	var store Store
+
 	// Handle the file
 	inFile, _ := os.Open(filename)
 	defer inFile.Close()
@@ -63,34 +73,51 @@ func parsefile(filename string) (s Services, err error) {
 
 	// Create backends array
 
-OUTER:
 	for scanner.Scan() {
 		line := scanner.Text()
-		backend_name, _ := getBackend(line)
-
-		if backend_name != "null" {
-			// Add new backend
-			s.Service[backend_name] = []string{}
-			// Start sub process to get servers
-			for scanner.Scan() {
-				line := scanner.Text()
-				// Break sub process when new backend is found
-				check_backend, _ := getBackend(line)
-				log.Println("CHECK ", check_backend, backend_name)
-				if check_backend != "null" {
-					if check_backend != backend_name {
-						log.Println("BREAKING SUB PROCESS")
-						continue OUTER
+		log.Println(line)
+		log.Println("STORED: ", store.Name)
+		if len(store.Name) == 0 {
+			backend_name, _ := getBackend(line)
+			if backend_name != "null" {
+				s.Service[backend_name] = []string{}
+				for scanner.Scan() {
+					line := scanner.Text()
+					check, _ := getBackend(line)
+					if check != "null" {
+						store.Name = check
+						break
 					}
-					continue
-				}
-				server_ip, _ := getIp(line)
-				if server_ip != "null" {
-					s.Service[backend_name] = append(s.Service[backend_name], server_ip)
+					server_ip, _ := getIp(line)
+					if server_ip != "null" {
+						s.Service[backend_name] = append(s.Service[backend_name], server_ip)
+					}
 				}
 			}
 		}
+		server_ip, _ := getIp(line)
+		if server_ip != "null" {
+			s.Service[store.Name] = append(s.Service[store.Name], server_ip)
+		}
 	}
+
+	// Start sub process to get servers
+	//		for scanner.Scan() {
+	//			line := scanner.Text()
+	//			// Break sub process when new backend is found
+	//			check_backend, _ := getBackend(line)
+	///			log.Println("CHECK ", check_backend, backend_name)
+	//			if check_backend != "null" {
+	//				if check_backend != backend_name {
+	//					log.Println("BREAKING SUB PROCESS")
+	//					break
+	//				}
+	//				continue
+	//			}
+	///
+	//		}
+	//		}
+	//	}
 
 	log.Println("Final Hash:\n")
 	log.Println(s)
