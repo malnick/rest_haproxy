@@ -18,6 +18,7 @@ type Store struct {
 	Name string
 }
 
+// Store the sub backend here in the sub for loop of the file parser
 func (s Store) storedBackend() string {
 	return s.Name
 }
@@ -27,15 +28,13 @@ func getBackend(line string) (backend string, err error) {
 	// Regex for Backend
 	match_bkend, err := regexp.Compile(`^\s*backend`)
 	if err != nil {
-		return "Failed", err
+		return "Failed matching backend", err
 	}
-	log.Println("ATTEMPTED MATCH ON LINE FOR BACKEND: ", line)
 	if match_bkend.MatchString(line) {
-		log.Println("MATCHED BACKEND: ", line)
 		larry := strings.Fields(line)
 		name := larry[1]
 		backend = name
-		log.Println(backend)
+		log.Println("MATCHED BACKEND: ", backend)
 		return backend, nil
 	}
 
@@ -50,19 +49,19 @@ func getIp(line string) (ip string, err error) {
 	}
 
 	if match_srv.MatchString(line) {
-		log.Println("MATCHED SERVER:\n", line)
 		larry := strings.Fields(line)
 		ip := larry[2]
 		log.Println(ip)
+		log.Println("MATCHED SERVER: ", ip)
 		return ip, nil
 	}
 	return "null", nil
 }
 
 func parsefile(filename string) (s Services, err error) {
-
+	// You know, a simple []map[string]map[string][]string
 	s.Service = make(map[string][]string)
-
+	// Stupid hack that could probably be solved with recursion...
 	var store Store
 
 	// Handle the file
@@ -71,12 +70,9 @@ func parsefile(filename string) (s Services, err error) {
 	scanner := bufio.NewScanner(inFile)
 	scanner.Split(bufio.ScanLines)
 
-	// Create backends array
-
 	for scanner.Scan() {
 		line := scanner.Text()
-		log.Println(line)
-		log.Println("STORED: ", store.Name)
+		log.Println("STORED BACKEND: ", store.Name)
 		if len(store.Name) == 0 {
 			backend_name, _ := getBackend(line)
 			if backend_name != "null" {
@@ -100,24 +96,6 @@ func parsefile(filename string) (s Services, err error) {
 			s.Service[store.Name] = append(s.Service[store.Name], server_ip)
 		}
 	}
-
-	// Start sub process to get servers
-	//		for scanner.Scan() {
-	//			line := scanner.Text()
-	//			// Break sub process when new backend is found
-	//			check_backend, _ := getBackend(line)
-	///			log.Println("CHECK ", check_backend, backend_name)
-	//			if check_backend != "null" {
-	//				if check_backend != backend_name {
-	//					log.Println("BREAKING SUB PROCESS")
-	//					break
-	//				}
-	//				continue
-	//			}
-	///
-	//		}
-	//		}
-	//	}
 
 	log.Println("Final Hash:\n")
 	log.Println(s)
