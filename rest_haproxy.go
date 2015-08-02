@@ -90,11 +90,28 @@ func parsefile(filename string) (s Services, err error) {
 					}
 				}
 			}
+		} else {
+			backend_name := store.Name
+			if backend_name != "null" {
+				s.Service[backend_name] = []string{}
+				for scanner.Scan() {
+					line := scanner.Text()
+					check, _ := getBackend(line)
+					if check != "null" {
+						store.Name = check
+						break
+					}
+					server_ip, _ := getIp(line)
+					if server_ip != "null" {
+						s.Service[backend_name] = append(s.Service[backend_name], server_ip)
+					}
+				}
+			}
 		}
-		server_ip, _ := getIp(line)
-		if server_ip != "null" {
-			s.Service[store.Name] = append(s.Service[store.Name], server_ip)
-		}
+		//server_ip, _ := getIp(line)
+		//if server_ip != "null" {
+		//	s.Service[store.Name] = append(s.Service[store.Name], server_ip)
+		//}
 	}
 
 	log.Println("Final Hash:\n")
