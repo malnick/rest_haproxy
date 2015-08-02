@@ -47,56 +47,20 @@ Will result in the following JSON endpoint available at: ```localhost:3000/servi
 
 ```json
 {
-  "Servers": [
-    {
-      "Name": "service-01",
-      "Ip": "10.0.1.10",
-      "Port": "31501",
-      "MgmtPort": "32501"
-    },
-    {
-      "Name": "service-02",
-      "Ip": "10.0.1.10",
-      "Port": "21502",
-      "MgmtPort": "32502"
-    },
-    {
-      "Name": "service-03",
-      "Ip": "10.0.2.10",
-      "Port": "31500",
-      "MgmtPort": "32501"
-    },
-    {
-      "Name": "service-04",
-      "Ip": "10.0.2.11",
-      "Port": "31500",
-      "MgmtPort": "32502"
-    },
-    {
-      "Name": "service-01",
-      "Ip": "10.0.5.10",
-      "Port": "31501",
-      "MgmtPort": "31501"
-    },
-    {
-      "Name": "service-02",
-      "Ip": "10.0.5.10",
-      "Port": "21502",
-      "MgmtPort": "21502"
-    },
-    {
-      "Name": "service-03",
-      "Ip": "10.0.5.10",
-      "Port": "31503",
-      "MgmtPort": "31503"
-    },
-    {
-      "Name": "service-04",
-      "Ip": "10.0.5.11",
-      "Port": "31500",
-      "MgmtPort": "31500"
-    }
-  ]
+  "Service": {
+    "other_service": [
+      "10.0.5.10:31501",
+      "10.0.5.10:21502",
+      "10.0.5.10:31503",
+      "10.0.5.11:31500"
+    ],
+    "service": [
+      "10.0.1.10:31501",
+      "10.0.1.10:21502",
+      "10.0.2.10:31500",
+      "10.0.2.11:31500"
+    ]
+  }
 }
 ```
 
