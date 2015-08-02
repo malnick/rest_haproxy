@@ -55,13 +55,13 @@ Will result in the following JSON endpoint available at: ```localhost:3000/servi
       "10.0.5.11:31500"
     ],
     "service": [
-      "10.0.1.10:31501",
-      "10.0.1.10:21502",
-      "10.0.2.10:31500",
-      "10.0.2.11:31500"
+      "10.0.1.10:31501 10.0.1.10:32501",
+      "10.0.1.10:21502 10.0.1.10:32502",
+      "10.0.2.10:31500 10.0.2.10:32501",
+      "10.0.2.11:31500 10.0.2.11:32502"
     ]
   }
 }
 ```
 
-
+The second set of IP's in 'service' Service is the address to ```check port $someport```, which is usually a management address.
