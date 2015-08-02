@@ -70,6 +70,7 @@ func parsefile(filename string) (s Services, err error) {
 	scanner := bufio.NewScanner(inFile)
 	scanner.Split(bufio.ScanLines)
 
+	// Two nested loops to deal with scoping of next backend being the last arg in the nested loop
 	for scanner.Scan() {
 		line := scanner.Text()
 		log.Println("STORED BACKEND: ", store.Name)
