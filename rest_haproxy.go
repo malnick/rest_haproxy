@@ -122,10 +122,6 @@ func parsefile(filename string) (s Services, err error) {
 				}
 			}
 		}
-		//server_ip, _ := getIp(line)
-		//if server_ip != "null" {
-		//	s.Service[store.Name] = append(s.Service[store.Name], server_ip)
-		//}
 	}
 
 	log.Println("Final Hash:\n")
