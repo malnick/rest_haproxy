@@ -50,10 +50,23 @@ func getIp(line string) (ip string, err error) {
 
 	if match_srv.MatchString(line) {
 		larry := strings.Fields(line)
-		ip := larry[2]
-		log.Println(ip)
-		log.Println("MATCHED SERVER: ", ip)
-		return ip, nil
+		svc_address := larry[2]
+		// Get mgmt address
+		if len(larry) == 6 {
+			mgmt_port := larry[5]
+			dest := strings.Split(svc_address, ":")
+			ip := dest[0]
+			log.Println("IP: ", ip)
+			log.Println("MGMT: ", mgmt_port)
+			mgmt_temp := []string{ip, ":", mgmt_port}
+			mgmt_address := strings.Join(mgmt_temp, "")
+			final_temp := []string{svc_address, mgmt_address}
+			final := strings.Join(final_temp, " ")
+			log.Println("MATCHED SERVER: ", final)
+			return final, nil
+		}
+		log.Println("MATCHED SERVER: ", svc_address)
+		return svc_address, nil
 	}
 	return "null", nil
 }
