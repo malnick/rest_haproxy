@@ -45,6 +45,8 @@ backend other_service
 
 Will result in the following JSON endpoint available at: ```localhost:3000/services```
 
+map[string]map[string][]string
+
 ```json
 {
   "Service": {
