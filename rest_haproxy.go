@@ -52,8 +52,8 @@ func getIp(line string) (ip string, err error) {
 		larry := strings.Fields(line)
 		svc_address := larry[2]
 		// Get mgmt address
-		if len(larry) >= 6 {
-			mgmt_port := larry[5]
+		if len(larry) > 5 {
+			mgmt_port := larry[len(larry)-1]
 			dest := strings.Split(svc_address, ":")
 			ip := dest[0]
 			log.Println("IP: ", ip)
