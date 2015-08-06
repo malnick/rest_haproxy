@@ -62,7 +62,7 @@ func getIp(line string) (ip string, err error) {
 			mgmt_address := strings.Join(mgmt_temp, "")
 			final_temp := []string{svc_address, mgmt_address}
 			final := strings.Join(final_temp, " ")
-			log.Println("MATCHED SERVER: ", final)
+			log.Println("MATCHED MGMT SERVER: ", final)
 			return final, nil
 		}
 		log.Println("MATCHED SERVER: ", svc_address)
