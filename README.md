@@ -1,3 +1,4 @@
+<img style="float: center;" src="https://dl.dropboxusercontent.com/u/77193293/resthaproxy.png">
 # REST HaProxy
 REST HaProxy exposes the server inputs in haproxy.cfg as JSON parameters so you can query any haproxy and know what services are available, on what ports.
 
